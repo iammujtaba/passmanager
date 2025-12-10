@@ -23,12 +23,109 @@ void main() async {
 class PasswordManagerApp extends StatelessWidget {
   const PasswordManagerApp({super.key});
 
+  static const _primaryColor = Color(0xFF6366F1);
+  static const _secondaryColor = Color(0xFF8B5CF6);
+  static const _surfaceColor = Color(0xFFF8FAFC);
+  static const _cardColor = Colors.white;
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: _primaryColor,
+      brightness: Brightness.light,
+      primary: _primaryColor,
+      secondary: _secondaryColor,
+      surface: _surfaceColor,
+    );
+
     final theme = ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0A84FF)),
+      colorScheme: colorScheme,
       useMaterial3: true,
-      textTheme: GoogleFonts.ibmPlexSansTextTheme(),
+      scaffoldBackgroundColor: _surfaceColor,
+      textTheme: GoogleFonts.interTextTheme().copyWith(
+        headlineLarge: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 32),
+        headlineMedium: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 24),
+        headlineSmall: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 20),
+        titleLarge: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 18),
+        titleMedium: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 16),
+        bodyLarge: GoogleFonts.inter(fontSize: 16),
+        bodyMedium: GoogleFonts.inter(fontSize: 14),
+        bodySmall: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
+        labelSmall: GoogleFonts.inter(fontSize: 11, color: Colors.grey[500]),
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        titleTextStyle: GoogleFonts.inter(
+          fontSize: 24,
+          fontWeight: FontWeight.w700,
+          color: Colors.grey[900],
+        ),
+        iconTheme: IconThemeData(color: Colors.grey[800]),
+      ),
+      cardTheme: CardThemeData(
+        color: _cardColor,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.grey.shade200),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.grey[50],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade200),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade200),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: _primaryColor, width: 2),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          textStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          side: BorderSide(color: Colors.grey.shade300),
+          textStyle: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 15),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 0,
+          textStyle: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 14),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: Colors.grey[100],
+        selectedColor: _primaryColor.withOpacity(0.15),
+        labelStyle: GoogleFonts.inter(fontSize: 13),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        side: BorderSide.none,
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: _primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
     );
 
     return MaterialApp(
@@ -157,76 +254,165 @@ class _TokenSetupScreenState extends State<TokenSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Set up token')),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              theme.colorScheme.primary.withOpacity(0.08),
+              theme.colorScheme.surface,
+            ],
+            stops: const [0.0, 0.3],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Enter a strong master token for encryption. Optionally add a PIN for quick unlocks.',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _tokenController,
-                  decoration: const InputDecoration(labelText: 'Master token'),
-                  obscureText: true,
-                  validator: (value) => value == null || value.trim().isEmpty ? 'Token is required' : null,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _confirmTokenController,
-                  decoration: const InputDecoration(labelText: 'Confirm token'),
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Confirm the token';
-                    }
-                    if (value.trim() != _tokenController.text.trim()) {
-                      return 'Tokens do not match';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _pinController,
-                  decoration: const InputDecoration(labelText: 'PIN (optional)'),
-                  keyboardType: TextInputType.number,
-                  obscureText: true,
-                  maxLength: 8,
-                ),
-                TextFormField(
-                  controller: _confirmPinController,
-                  decoration: const InputDecoration(labelText: 'Confirm PIN'),
-                  keyboardType: TextInputType.number,
-                  obscureText: true,
-                  maxLength: 8,
-                  validator: (value) {
-                    final pin = _pinController.text.trim();
-                    if (pin.isEmpty) return null;
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Confirm the PIN';
-                    }
-                    if (value.trim() != pin) {
-                      return 'PINs do not match';
-                    }
-                    return null;
-                  },
+                const SizedBox(height: 40),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [theme.colorScheme.primary, theme.colorScheme.secondary],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.colorScheme.primary.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.shield_rounded, size: 48, color: Colors.white),
                 ),
                 const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: _saving ? null : _submit,
-                    child: _saving
-                        ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Text('Save and continue'),
+                Text(
+                  'Secure Your Vault',
+                  style: theme.textTheme.headlineMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Create a master token to encrypt all your passwords. Add an optional PIN for quick access.',
+                  style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 32),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.key_rounded, color: theme.colorScheme.primary, size: 20),
+                              const SizedBox(width: 8),
+                              Text('Master Token', style: theme.textTheme.titleMedium),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _tokenController,
+                            decoration: const InputDecoration(
+                              labelText: 'Enter master token',
+                              prefixIcon: Icon(Icons.lock_outline_rounded),
+                            ),
+                            obscureText: true,
+                            validator: (value) => value == null || value.trim().isEmpty ? 'Token is required' : null,
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _confirmTokenController,
+                            decoration: const InputDecoration(
+                              labelText: 'Confirm master token',
+                              prefixIcon: Icon(Icons.lock_outline_rounded),
+                            ),
+                            obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Confirm the token';
+                              }
+                              if (value.trim() != _tokenController.text.trim()) {
+                                return 'Tokens do not match';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 24),
+                          const Divider(),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Icon(Icons.pin_rounded, color: theme.colorScheme.secondary, size: 20),
+                              const SizedBox(width: 8),
+                              Text('Quick PIN', style: theme.textTheme.titleMedium),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text('Optional', style: theme.textTheme.labelSmall),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _pinController,
+                            decoration: const InputDecoration(
+                              labelText: 'PIN (4-8 digits)',
+                              prefixIcon: Icon(Icons.dialpad_rounded),
+                            ),
+                            keyboardType: TextInputType.number,
+                            obscureText: true,
+                            maxLength: 8,
+                          ),
+                          TextFormField(
+                            controller: _confirmPinController,
+                            decoration: const InputDecoration(
+                              labelText: 'Confirm PIN',
+                              prefixIcon: Icon(Icons.dialpad_rounded),
+                            ),
+                            keyboardType: TextInputType.number,
+                            obscureText: true,
+                            maxLength: 8,
+                            validator: (value) {
+                              final pin = _pinController.text.trim();
+                              if (pin.isEmpty) return null;
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Confirm the PIN';
+                              }
+                              if (value.trim() != pin) {
+                                return 'PINs do not match';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 24),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: FilledButton.icon(
+                              onPressed: _saving ? null : _submit,
+                              icon: _saving
+                                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                  : const Icon(Icons.check_rounded),
+                              label: const Text('Create Vault'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -335,58 +521,128 @@ class _AppLockScreenState extends State<AppLockScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.hasPin ? 'Enter PIN to unlock' : 'Unlock Password Manager';
+    final theme = Theme.of(context);
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.lock, size: 72, color: Theme.of(context).colorScheme.primary),
-                  const SizedBox(height: 16),
-                  Text(title, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
-                  const SizedBox(height: 24),
-                  if (widget.hasPin)
-                    TextField(
-                      controller: _pinController,
-                      decoration: InputDecoration(labelText: 'PIN', errorText: _error),
-                      keyboardType: TextInputType.number,
-                      obscureText: true,
-                      maxLength: 8,
-                    )
-                  else
-                    Text(
-                      'No PIN configured. Use biometrics if available or continue below.',
-                      textAlign: TextAlign.center,
-                    ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: _verifyingPin ? null : _unlockWithPin,
-                      child: _verifyingPin
-                          ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                          : Text(widget.hasPin ? 'Unlock' : 'Continue'),
-                    ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              theme.colorScheme.primary.withOpacity(0.05),
+              theme.colorScheme.secondary.withOpacity(0.08),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [theme.colorScheme.primary, theme.colorScheme.secondary],
+                          ),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: theme.colorScheme.primary.withOpacity(0.3),
+                              blurRadius: 24,
+                              offset: const Offset(0, 12),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(Icons.lock_rounded, size: 56, color: Colors.white),
+                      ),
+                      const SizedBox(height: 32),
+                      Text(
+                        'Welcome Back',
+                        style: theme.textTheme.headlineMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        widget.hasPin
+                            ? 'Enter your PIN to unlock your vault'
+                            : 'Use biometrics or continue to access your passwords',
+                        style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
+                      if (widget.hasPin) ...[
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Column(
+                              children: [
+                                TextField(
+                                  controller: _pinController,
+                                  decoration: InputDecoration(
+                                    labelText: 'PIN',
+                                    errorText: _error,
+                                    prefixIcon: const Icon(Icons.dialpad_rounded),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  obscureText: true,
+                                  maxLength: 8,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(fontSize: 24, letterSpacing: 8),
+                                ),
+                                const SizedBox(height: 16),
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 52,
+                                  child: FilledButton.icon(
+                                    onPressed: _verifyingPin ? null : _unlockWithPin,
+                                    icon: _verifyingPin
+                                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                        : const Icon(Icons.lock_open_rounded),
+                                    label: const Text('Unlock'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ] else ...[
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: FilledButton.icon(
+                            onPressed: _verifyingPin ? null : _unlockWithPin,
+                            icon: _verifyingPin
+                                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                : const Icon(Icons.arrow_forward_rounded),
+                            label: const Text('Continue'),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      if (_biometricsAvailable)
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: OutlinedButton.icon(
+                            onPressed: _authenticateBiometric,
+                            icon: const Icon(Icons.fingerprint_rounded),
+                            label: const Text('Use Biometrics'),
+                          ),
+                        )
+                      else if (!_checkingBiometrics && !kIsWeb)
+                        TextButton.icon(
+                          onPressed: _prepareBiometrics,
+                          icon: const Icon(Icons.refresh_rounded),
+                          label: const Text('Check biometrics'),
+                        ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  if (_biometricsAvailable)
-                    OutlinedButton.icon(
-                      onPressed: _authenticateBiometric,
-                      icon: const Icon(Icons.fingerprint),
-                      label: const Text('Use biometrics'),
-                    )
-                  else if (!_checkingBiometrics && !kIsWeb)
-                    OutlinedButton.icon(
-                      onPressed: _prepareBiometrics,
-                      icon: const Icon(Icons.refresh),
-                      label: const Text('Check biometrics'),
-                    ),
-                ],
+                ),
               ),
             ),
           ),
@@ -677,31 +933,59 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _shareEntry(PasswordEntry entry) async {
-    final payload = jsonEncode({
+    if (_encryptionService == null) return;
+    
+    // Encrypt all sensitive fields
+    final encryptedUsername = entry.username.isNotEmpty 
+        ? await _encryptionService!.encrypt(entry.username) : null;
+    final encryptedEmail = entry.email.isNotEmpty 
+        ? await _encryptionService!.encrypt(entry.email) : null;
+    final encryptedTitle = (entry.title ?? '').isNotEmpty 
+        ? await _encryptionService!.encrypt(entry.title!) : null;
+    final encryptedWebsite = (entry.website ?? '').isNotEmpty 
+        ? await _encryptionService!.encrypt(entry.website!) : null;
+    final encryptedAlias = (entry.alias ?? '').isNotEmpty 
+        ? await _encryptionService!.encrypt(entry.alias!) : null;
+    final encryptedCategory = (entry.category ?? '').isNotEmpty 
+        ? await _encryptionService!.encrypt(entry.category!) : null;
+    final encryptedHint = (entry.hint ?? '').isNotEmpty 
+        ? await _encryptionService!.encrypt(entry.hint!) : null;
+    final encryptedDescription = (entry.description ?? '').isNotEmpty 
+        ? await _encryptionService!.encrypt(entry.description!) : null;
+    final encryptedTags = entry.tags.isNotEmpty 
+        ? await _encryptionService!.encrypt(entry.tags.join('|')) : null;
+    final encryptedTwoFaType = (entry.twoFaType ?? '').isNotEmpty 
+        ? await _encryptionService!.encrypt(entry.twoFaType!) : null;
+    
+    final payload = {
+      'v': 2, // Version 2 = fully encrypted
       'id': entry.id,
-      'username': entry.username,
-      'email': entry.email,
-      'cipher': entry.encryptedPassword,
-      'iv': entry.iv,
-      'title': entry.title,
-      'website': entry.website,
-      'alias': entry.alias,
-      'category': entry.category,
-      'hint': entry.hint,
-      'description': entry.description,
-      'tags': entry.tags,
-      'is_2fa_enabled': entry.isTwoFaEnabled,
-      'two_fa_type': entry.twoFaType,
-      'two_fa_backup_codes': entry.twoFaBackupCodes,
-      'two_fa_backup_iv': entry.twoFaBackupIv,
-      'password_last_changed_at': entry.passwordLastChangedAt,
-      'created_at': entry.createdAt,
-      'updated_at': entry.updatedAt,
-    });
-    final shareName = entry.username.isNotEmpty
-        ? entry.username
-        : (entry.email.isNotEmpty ? entry.email : 'account');
-    await Share.share(payload, subject: 'Encrypted password for $shareName');
+      'u': encryptedUsername != null ? '${encryptedUsername.cipherText}:${encryptedUsername.iv}' : null,
+      'e': encryptedEmail != null ? '${encryptedEmail.cipherText}:${encryptedEmail.iv}' : null,
+      'p': '${entry.encryptedPassword}:${entry.iv}',
+      't': encryptedTitle != null ? '${encryptedTitle.cipherText}:${encryptedTitle.iv}' : null,
+      'w': encryptedWebsite != null ? '${encryptedWebsite.cipherText}:${encryptedWebsite.iv}' : null,
+      'a': encryptedAlias != null ? '${encryptedAlias.cipherText}:${encryptedAlias.iv}' : null,
+      'c': encryptedCategory != null ? '${encryptedCategory.cipherText}:${encryptedCategory.iv}' : null,
+      'h': encryptedHint != null ? '${encryptedHint.cipherText}:${encryptedHint.iv}' : null,
+      'd': encryptedDescription != null ? '${encryptedDescription.cipherText}:${encryptedDescription.iv}' : null,
+      'tg': encryptedTags != null ? '${encryptedTags.cipherText}:${encryptedTags.iv}' : null,
+      '2fa': entry.isTwoFaEnabled,
+      '2ft': encryptedTwoFaType != null ? '${encryptedTwoFaType.cipherText}:${encryptedTwoFaType.iv}' : null,
+      '2fb': entry.twoFaBackupCodes != null ? '${entry.twoFaBackupCodes}:${entry.twoFaBackupIv}' : null,
+    };
+    
+    // Remove null values to minimize size
+    payload.removeWhere((key, value) => value == null);
+    
+    // Encode to base64 (no compression - encrypted data doesn't compress well)
+    final jsonBytes = utf8.encode(jsonEncode(payload));
+    final base64String = base64Url.encode(jsonBytes);
+    
+    // Add prefix for identification
+    final shareCode = 'PM2:$base64String';
+    
+    await Share.share(shareCode);
   }
 
   Future<void> _importSharedPayload() async {
@@ -710,14 +994,38 @@ class _HomeScreenState extends State<HomeScreen> {
     final payloadText = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Paste shared JSON'),
-        content: TextField(
-          controller: controller,
-          maxLines: 6,
-          decoration: const InputDecoration(
-            hintText: '{"username":"user","cipher":"..."}',
-            border: OutlineInputBorder(),
-          ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.download_rounded, color: Theme.of(context).colorScheme.primary),
+            ),
+            const SizedBox(width: 12),
+            const Text('Import Password'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Paste the shared code (starts with PM2:)',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              maxLines: 4,
+              decoration: const InputDecoration(
+                hintText: 'PM2:H4sIAAAA...',
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
@@ -726,41 +1034,129 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
     if (payloadText == null || payloadText.isEmpty) return;
+    
     try {
-      final normalized = _extractJsonBlock(payloadText);
-      final decoded = jsonDecode(normalized) as Map<String, dynamic>;
-      final nowIso = DateTime.now().toIso8601String();
-      final rawTags = decoded['tags'];
-      List<String>? tags;
-      if (rawTags is List) {
-        tags = rawTags.map((e) => e.toString()).toList();
-      } else if (rawTags is String) {
-        tags = rawTags.split(',').map((e) => e.trim()).where((element) => element.isNotEmpty).toList();
+      Map<String, dynamic> decoded;
+      bool isV2 = false;
+      
+      // Check for new format (PM2:base64)
+      if (payloadText.startsWith('PM2:')) {
+        isV2 = true;
+        final base64Part = payloadText.substring(4);
+        final jsonBytes = base64Url.decode(base64Part);
+        decoded = jsonDecode(utf8.decode(jsonBytes)) as Map<String, dynamic>;
+      } else {
+        // Legacy JSON format
+        final normalized = _extractJsonBlock(payloadText);
+        decoded = jsonDecode(normalized) as Map<String, dynamic>;
       }
+      
+      final nowIso = DateTime.now().toIso8601String();
+      
+      String decryptField(String? encryptedField) {
+        if (encryptedField == null || encryptedField.isEmpty) return '';
+        final parts = encryptedField.split(':');
+        if (parts.length != 2) return '';
+        return _encryptionService!.decrypt(
+          EncryptedPayload(cipherText: parts[0], iv: parts[1]),
+        );
+      }
+      
+      String username, email, encryptedPassword, iv;
+      String? title, website, alias, category, hint, description, twoFaType;
+      String? twoFaBackupCodes, twoFaBackupIv;
+      List<String> tags = [];
+      bool isTwoFaEnabled = false;
+      
+      if (isV2 && decoded['v'] == 2) {
+        // Decrypt all fields from v2 format
+        username = decryptField(decoded['u'] as String?);
+        email = decryptField(decoded['e'] as String?);
+        
+        final passwordParts = (decoded['p'] as String).split(':');
+        encryptedPassword = passwordParts[0];
+        iv = passwordParts[1];
+        
+        title = decryptField(decoded['t'] as String?);
+        if (title!.isEmpty) title = null;
+        website = decryptField(decoded['w'] as String?);
+        if (website!.isEmpty) website = null;
+        alias = decryptField(decoded['a'] as String?);
+        if (alias!.isEmpty) alias = null;
+        category = decryptField(decoded['c'] as String?);
+        if (category!.isEmpty) category = null;
+        hint = decryptField(decoded['h'] as String?);
+        if (hint!.isEmpty) hint = null;
+        description = decryptField(decoded['d'] as String?);
+        if (description!.isEmpty) description = null;
+        
+        final tagsDecrypted = decryptField(decoded['tg'] as String?);
+        if (tagsDecrypted.isNotEmpty) {
+          tags = tagsDecrypted.split('|').where((t) => t.isNotEmpty).toList();
+        }
+        
+        isTwoFaEnabled = decoded['2fa'] as bool? ?? false;
+        twoFaType = decryptField(decoded['2ft'] as String?);
+        if (twoFaType!.isEmpty) twoFaType = null;
+        
+        final backupField = decoded['2fb'] as String?;
+        if (backupField != null && backupField.isNotEmpty) {
+          final backupParts = backupField.split(':');
+          twoFaBackupCodes = backupParts[0];
+          twoFaBackupIv = backupParts.length > 1 ? backupParts[1] : null;
+        }
+      } else {
+        // Legacy format
+        username = decoded['username'] as String? ?? '';
+        email = decoded['email'] as String? ?? '';
+        encryptedPassword = decoded['cipher'] as String;
+        iv = decoded['iv'] as String;
+        title = decoded['title'] as String?;
+        website = decoded['website'] as String?;
+        alias = decoded['alias'] as String?;
+        category = decoded['category'] as String?;
+        hint = decoded['hint'] as String?;
+        description = decoded['description'] as String?;
+        
+        final rawTags = decoded['tags'];
+        if (rawTags is List) {
+          tags = rawTags.map((e) => e.toString()).toList();
+        } else if (rawTags is String) {
+          tags = rawTags.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+        }
+        
+        isTwoFaEnabled = decoded['is_2fa_enabled'] as bool? ?? false;
+        twoFaType = decoded['two_fa_type'] as String?;
+        twoFaBackupCodes = decoded['two_fa_backup_codes'] as String?;
+        twoFaBackupIv = decoded['two_fa_backup_iv'] as String?;
+      }
+      
       final entry = PasswordEntry(
         id: decoded['id'] as String? ?? const Uuid().v4(),
-        username: decoded['username'] as String? ?? '',
-        email: decoded['email'] as String? ?? '',
-        encryptedPassword: decoded['cipher'] as String,
-        iv: decoded['iv'] as String,
-        title: decoded['title'] as String?,
-        website: decoded['website'] as String?,
-        alias: decoded['alias'] as String?,
-        category: decoded['category'] as String?,
-        hint: decoded['hint'] as String?,
-        description: decoded['description'] as String?,
+        username: username,
+        email: email,
+        encryptedPassword: encryptedPassword,
+        iv: iv,
+        title: title,
+        website: website,
+        alias: alias,
+        category: category,
+        hint: hint,
+        description: description,
         tags: tags,
-        isTwoFaEnabled: decoded['is_2fa_enabled'] as bool? ?? false,
-        twoFaType: decoded['two_fa_type'] as String?,
-        twoFaBackupCodes: decoded['two_fa_backup_codes'] as String?,
-        twoFaBackupIv: decoded['two_fa_backup_iv'] as String?,
+        isTwoFaEnabled: isTwoFaEnabled,
+        twoFaType: twoFaType,
+        twoFaBackupCodes: twoFaBackupCodes,
+        twoFaBackupIv: twoFaBackupIv,
         passwordLastChangedAt: decoded['password_last_changed_at'] as String?,
         createdAt: decoded['created_at'] as String? ?? nowIso,
         updatedAt: decoded['updated_at'] as String? ?? nowIso,
       );
+      
       final decrypted = _encryptionService!.decrypt(
         EncryptedPayload(cipherText: entry.encryptedPassword, iv: entry.iv),
       );
+      
       final entries = await _repository.fetchEntries();
       entries.add(entry);
       await _repository.saveEntries(entries);
@@ -768,45 +1164,126 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _entriesFuture = Future.value(entries);
       });
+      
       await showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Decryption successful'),
-          content: SelectableText('Password: $decrypted'),
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.check_circle_rounded, color: Colors.green),
+              ),
+              const SizedBox(width: 12),
+              const Text('Import Successful'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Password decrypted successfully!', style: Theme.of(context).textTheme.bodyMedium),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: SelectableText(decrypted, style: const TextStyle(fontFamily: 'monospace')),
+              ),
+            ],
+          ),
+          actions: [FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Done'))],
         ),
       );
     } catch (error, stack) {
       debugPrint('Import failed: $error\n$stack');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unable to import data: ${error.runtimeType}')),
+        SnackBar(
+          content: Text('Import failed: ${error.runtimeType}'),
+          backgroundColor: Colors.red[600],
+        ),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Password Manager'),
+        toolbarHeight: 70,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [theme.colorScheme.primary, theme.colorScheme.secondary],
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.shield_rounded, color: Colors.white, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Vault',
+              style: GoogleFonts.inter(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: Colors.grey[900],
+              ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
-            tooltip: 'Import shared data',
+            tooltip: 'Import password',
             onPressed: _importSharedPayload,
-            icon: const Icon(Icons.download_for_offline_outlined),
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.download_rounded, color: theme.colorScheme.primary, size: 20),
+            ),
           ),
+          const SizedBox(width: 4),
           IconButton(
+            tooltip: 'Lock vault',
             onPressed: () async {
               final navigator = Navigator.of(context);
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: const Text('Lock the app?'),
-                  content: const Text('This only locks the app.'),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  title: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.lock_rounded, color: Colors.orange),
+                      ),
+                      const SizedBox(width: 12),
+                      const Text('Lock Vault?'),
+                    ],
+                  ),
+                  content: const Text('Your vault will be locked and you\'ll need to enter your PIN or use biometrics to unlock.'),
                   actions: [
                     TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-                    FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('OK')),
+                    FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Lock')),
                   ],
                 ),
               );
@@ -831,8 +1308,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
             },
-            icon: const Icon(Icons.lock_reset),
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.lock_rounded, color: Colors.orange, size: 20),
+            ),
           ),
+          const SizedBox(width: 12),
         ],
       ),
       body: FutureBuilder<List<PasswordEntry>>(
@@ -926,8 +1411,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _encryptionService == null ? null : () => _addOrEditEntry(),
-        icon: const Icon(Icons.add),
-        label: const Text('New password'),
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Add Password'),
       ),
     );
   }
@@ -1165,125 +1650,254 @@ class _PasswordTileState extends State<PasswordTile> {
     }
     if (widget.entry.email.isNotEmpty) subtitleParts.add(widget.entry.email);
     final subtitle = subtitleParts.join(' • ');
-    final created = _formatTimestamp(widget.entry.createdAt);
     final updated = _formatTimestamp(widget.entry.updatedAt);
-    final passwordUpdated = _formatTimestamp(widget.entry.passwordLastChangedAt);
 
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(child: Text(title, style: theme.textTheme.titleMedium)),
-                IconButton(onPressed: widget.onEdit, icon: const Icon(Icons.edit)),
-                IconButton(onPressed: widget.onDelete, icon: const Icon(Icons.delete_outline)),
-              ],
-            ),
-            if (subtitle.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(subtitle, style: theme.textTheme.bodyMedium),
-            ],
-            if ((widget.entry.website ?? '').isNotEmpty) ...[
-              const SizedBox(height: 4),
-              SelectableText(widget.entry.website!, style: theme.textTheme.bodySmall),
-            ],
-            if ((widget.entry.category ?? '').isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text('Category: ${widget.entry.category}', style: theme.textTheme.bodySmall),
-              ),
-            if ((widget.entry.hint ?? '').isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text('Hint: ${widget.entry.hint}', style: theme.textTheme.bodySmall),
-              ),
-            if ((widget.entry.description ?? '').isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(widget.entry.description!, style: theme.textTheme.bodyMedium),
-              ),
-            if (widget.entry.tags.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children: widget.entry.tags.map((tag) => Chip(label: Text(tag))).toList(),
-              ),
-            ],
-            const SizedBox(height: 12),
-            Text('Encrypted password:', style: theme.textTheme.bodySmall),
-            SelectableText(widget.entry.encryptedPassword, style: theme.textTheme.labelMedium),
-            const SizedBox(height: 8),
-            if (_revealed && _plainPassword != null)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: _toggleReveal,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  Text('Decrypted password:', style: theme.textTheme.bodySmall),
-                  SelectableText(
-                    _plainPassword!,
-                    style: theme.textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          theme.colorScheme.primary.withOpacity(0.15),
+                          theme.colorScheme.secondary.withOpacity(0.1),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      _getCategoryIcon(widget.entry.category),
+                      color: theme.colorScheme.primary,
+                      size: 22,
+                    ),
                   ),
-                  if (_plainTwoFaCodes != null) ...[
-                    const SizedBox(height: 8),
-                    Text('2FA backup codes:', style: theme.textTheme.bodySmall),
-                    SelectableText(_plainTwoFaCodes!, style: theme.textTheme.bodyMedium),
-                  ],
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(title, style: theme.textTheme.titleMedium),
+                        if (subtitle.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              subtitle,
+                              style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  if (widget.entry.isTwoFaEnabled)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.verified_user_rounded, size: 14, color: Colors.green),
+                          const SizedBox(width: 4),
+                          Text('2FA', style: TextStyle(fontSize: 11, color: Colors.green[700], fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  PopupMenuButton<String>(
+                    icon: Icon(Icons.more_vert_rounded, color: Colors.grey[400]),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    onSelected: (value) {
+                      if (value == 'edit') widget.onEdit();
+                      if (value == 'delete') _confirmDelete();
+                      if (value == 'share') widget.onShare();
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(value: 'edit', child: Row(children: [Icon(Icons.edit_rounded, size: 18), SizedBox(width: 12), Text('Edit')])),
+                      const PopupMenuItem(value: 'share', child: Row(children: [Icon(Icons.share_rounded, size: 18), SizedBox(width: 12), Text('Share')])),
+                      PopupMenuItem(value: 'delete', child: Row(children: [Icon(Icons.delete_rounded, size: 18, color: Colors.red), SizedBox(width: 12), Text('Delete', style: TextStyle(color: Colors.red))])),
+                    ],
+                  ),
                 ],
               ),
-            if (widget.entry.isTwoFaEnabled || widget.entry.twoFaType != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Row(
+              if ((widget.entry.website ?? '').isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Row(
                   children: [
-                    Icon(Icons.security, size: 16, color: theme.colorScheme.primary),
-                    const SizedBox(width: 6),
-                    Text(
-                      widget.entry.isTwoFaEnabled
-                          ? '2FA enabled${widget.entry.twoFaType != null ? ' (${widget.entry.twoFaType})' : ''}'
-                          : '2FA disabled',
-                      style: theme.textTheme.bodySmall,
+                    Icon(Icons.link_rounded, size: 16, color: Colors.grey[400]),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        widget.entry.website!,
+                        style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.primary),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
-              ),
-            if (passwordUpdated != null || updated != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (passwordUpdated != null)
-                      Text('Password updated: $passwordUpdated', style: theme.textTheme.labelSmall),
-                    if (updated != null)
-                      Text('Modified: $updated', style: theme.textTheme.labelSmall),
-                    if (created != null && created != updated)
-                      Text('Created: $created', style: theme.textTheme.labelSmall),
-                  ],
-                ),
-              ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _toggleReveal,
-                  icon: Icon(_revealed ? Icons.visibility_off : Icons.visibility),
-                  label: Text(_revealed ? 'Hide' : 'Reveal'),
-                ),
-                const SizedBox(width: 8),
-                OutlinedButton.icon(
-                  onPressed: widget.onShare,
-                  icon: const Icon(Icons.share),
-                  label: const Text('Share'),
+              ],
+              if (widget.entry.tags.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: widget.entry.tags.map((tag) => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(tag, style: TextStyle(fontSize: 12, color: theme.colorScheme.primary, fontWeight: FontWeight.w500)),
+                  )).toList(),
                 ),
               ],
-            ),
-          ],
+              if (_revealed && _plainPassword != null) ...[
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.key_rounded, size: 16, color: Colors.grey[600]),
+                          const SizedBox(width: 8),
+                          Text('Password', style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w500)),
+                          const Spacer(),
+                          InkWell(
+                            onTap: () {
+                              Clipboard.setData(ClipboardData(text: _plainPassword!));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text('Password copied to clipboard'),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Icon(Icons.copy_rounded, size: 16, color: theme.colorScheme.primary),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      SelectableText(
+                        _plainPassword!,
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                      if (_plainTwoFaCodes != null) ...[
+                        const SizedBox(height: 12),
+                        const Divider(),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(Icons.security_rounded, size: 16, color: Colors.grey[600]),
+                            const SizedBox(width: 8),
+                            Text('2FA Backup Codes', style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w500)),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        SelectableText(_plainTwoFaCodes!, style: theme.textTheme.bodySmall),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  if (updated != null)
+                    Text('Updated $updated', style: theme.textTheme.labelSmall),
+                  const Spacer(),
+                  TextButton.icon(
+                    onPressed: _toggleReveal,
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ),
+                    icon: Icon(_revealed ? Icons.visibility_off_rounded : Icons.visibility_rounded, size: 18),
+                    label: Text(_revealed ? 'Hide' : 'Reveal'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  IconData _getCategoryIcon(String? category) {
+    final cat = (category ?? '').toLowerCase();
+    if (cat.contains('social')) return Icons.people_rounded;
+    if (cat.contains('bank') || cat.contains('finance')) return Icons.account_balance_rounded;
+    if (cat.contains('email') || cat.contains('mail')) return Icons.email_rounded;
+    if (cat.contains('work') || cat.contains('office')) return Icons.work_rounded;
+    if (cat.contains('shop') || cat.contains('store')) return Icons.shopping_bag_rounded;
+    if (cat.contains('game') || cat.contains('gaming')) return Icons.sports_esports_rounded;
+    if (cat.contains('dev') || cat.contains('code')) return Icons.code_rounded;
+    if (cat.contains('cloud') || cat.contains('storage')) return Icons.cloud_rounded;
+    return Icons.key_rounded;
+  }
+
+  Future<void> _confirmDelete() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.delete_rounded, color: Colors.red),
+            ),
+            const SizedBox(width: 12),
+            const Text('Delete Password?'),
+          ],
+        ),
+        content: const Text('This action cannot be undone. The password entry will be permanently deleted.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true) widget.onDelete();
   }
 }
 
